@@ -1,0 +1,101 @@
+<div class="container mx-auto px-4 py-8">
+
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Cart</h1>
+    <%= link_to "Catalog", products_path, class: "text-green-500 hover:text-green-700" %>
+  </div>
+
+  <%= turbo_frame_tag "cart" do %>
+    <div class="bg-white rounded-lg shadow-lg p-6 w-1/2 mx-auto">
+      <% if @cart_items.any? %>
+        <div class="flex justify-between mb-8">
+          <%= button_to reset_cart_items_path,
+              method: :post,
+              class: "ml-auto text-gray-500 hover:text-green-700" do %>
+            Reset
+          <% end %>
+        </div>
+        
+        <div class="space-y-6">
+          <% @cart_items.each do |item| %>
+            <%= turbo_frame_tag dom_id(item) do %>
+              <div class="flex items-center space-x-4 pb-4 border-b">
+                <div class="w-24 h-24">
+                  <%= image_tag item.product.image_url, class: "w-full h-full object-cover rounded" %>
+                </div>
+
+                <div class="flex-grow">
+                  <h3 class="font-semibold"><%= item.product.name %></h3>
+                  <p class="text-gray-600"><%= item.product.brand %></p>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                  <div class="flex items-center space-x-2">
+                    <%= button_to "-", cart_item_path(item, cart_item: { quantity: item.quantity - 1 }),
+                        method: :patch,
+                        class: "w-8 h-8 flex items-center justify-center border rounded hover:bg-gray-100", data: { turbo: false } %>
+                    <span class="w-8 text-center"><%= item.quantity %></span>
+                    <%= button_to "+", cart_item_path(item, cart_item: { quantity: item.quantity + 1 }),
+                        method: :patch,
+                        class: "w-8 h-8 flex items-center justify-center border rounded hover:bg-gray-100", data: { turbo: false } %>
+                  </div>
+
+                  <p class="font-semibold w-24 text-right">
+                    $<%= number_with_precision(item.total_price, precision: 2) %>
+                  </p>
+
+                  <%= button_to cart_item_path(item),
+                      method: :delete,
+                      class: "text-red-500 hover:text-red-700" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+
+
+        <div class="mx-auto bg-white shadow rounded-lg p-6 mt-6 w-full max-w-md">
+          <div class="flex justify-between text-sm font-medium text-gray-700 mb-4">
+            <span><%= @cart.cart_items.sum(:quantity) %> items</span>
+            <span>$<%= number_with_precision(@cart.total_price, precision: 2) %></span>
+          </div>
+
+          <div class="text-sm text-gray-500 mb-4">Move the slider to specify the discount amount</div>
+          <div class="mt-8" data-controller="discount" data-discount-subtotal-value="<%= @cart.total_price %>">
+            <div class="flex items-center gap-4 mb-4">
+              <label for="discount" class="font-semibold">Discount:</label>
+              <input
+                type="range"
+                id="discount"
+                min="0"
+                max="<%= @max_discount %>"
+                value="0"
+                class="w-full h-2 bg-green-100 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-green-500"
+                data-discount-target="slider">
+              <span id="discount-value" class="text-green-600 text-sm font-medium" data-discount-target="value">$0</span>
+            </div>
+
+            <%= turbo_frame_tag "cart-total" do %>
+              <div class="flex justify-between text-lg font-semibold text-gray-900 mb-6">
+                <span>Total</span>
+                <span id="final-total" data-discount-target="finalTotal">$<%= number_with_precision(@cart.total_price, precision: 2) %></span>
+              </div>
+            <% end %>
+          </div>
+
+          <%= button_to reset_cart_items_path,
+              method: :post,
+              class: "w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500" do %>
+            Place order
+          <% end %>
+        </div>
+      <% else %>
+        <%= render partial: "empty_cart" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

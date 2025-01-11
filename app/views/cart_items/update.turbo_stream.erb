@@ -1,0 +1,8 @@
+<%= turbo_stream.replace "final-total" do %>
+  <div class="flex justify-between text-lg font-semibold text-gray-900 mb-6">
+    <span>Total</span>
+    <span id="final-total" data-discount-target="finalTotal">
+      $<%= number_with_precision(@cart.total_price, precision: 2) %>
+    </span>
+  </div>
+<% end %>

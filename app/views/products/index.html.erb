@@ -1,0 +1,32 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Product Catalog</h1>
+    <%= link_to cart_items_path,
+        class: "fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-600" do %>
+      <div class="flex items-center">
+        View Cart
+      </div>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <% @products.each do |product| %>
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="aspect-w-1 aspect-h-1 mb-4">
+          <%= image_tag product.image_url, class: "object-cover rounded-lg" %>
+        </div>
+        <h2 class="text-xl font-semibold"><%= product.name %></h2>
+        <p class="text-gray-600 mt-1"><%= product.brand %></p>
+        <div class="flex justify-between items-center mt-4">
+          <p class="text-lg font-bold">$<%= number_with_precision(product.price, precision: 2) %></p>
+          <%= button_to cart_items_path(product_id: product.id),
+              method: :post,
+              class: "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600",
+              form_class: "inline-block" do %>
+                Add to Cart
+              <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
