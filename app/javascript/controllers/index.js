@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import CartController from "./cart_controller"
+application.register("cart", CartController)
+
 import DiscountController from "./discount_controller"
 application.register("discount", DiscountController)
 

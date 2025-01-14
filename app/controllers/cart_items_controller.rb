@@ -2,7 +2,7 @@ class CartItemsController < ApplicationController
   before_action :set_cart
 
   def index
-    @cart_items = @cart.cart_items.includes(:product)
+    @cart_items = @cart.cart_items.includes(:product) || []
     @max_discount = 100
   end
 
@@ -10,11 +10,11 @@ class CartItemsController < ApplicationController
     @cart_item = @cart.cart_items.find_or_initialize_by(product_id: params[:product_id])
     @cart_item.quantity = @cart_item.quantity.to_i + 1
 
-    return unless @cart_item.save
-
-    respond_to do |format|
-      format.turbo_stream { redirect_to cart_items_path }
-      format.html { redirect_to cart_items_path }
+    if @cart_item.save
+      respond_to do |format|
+        format.turbo_stream { redirect_to cart_items_path }
+        format.html { redirect_to cart_items_path }
+      end
     end
   end
 
@@ -23,11 +23,15 @@ class CartItemsController < ApplicationController
 
     return unless @cart_item.update(cart_item_params)
 
-    @cart = @cart_item.cart
+    @cart_items = @cart.cart_items
 
-    respond_to do |format|
-      format.turbo_stream { redirect_to cart_items_path }
-      format.html { redirect_to cart_items_path }
+    if @cart_item.update(cart_item_params)
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace("cart", template: "cart_items/index", locals: { cart_items: @cart_items })
+        end
+        format.html { redirect_to cart_items_path }
+      end
     end
   end
 
@@ -50,7 +54,9 @@ class CartItemsController < ApplicationController
     @cart.reset!
 
     respond_to do |format|
-      format.turbo_stream { redirect_to cart_items_path }
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("cart", partial: "cart_items/empty_cart")
+      end
       format.html { redirect_to cart_items_path }
     end
   end
