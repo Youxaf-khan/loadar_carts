@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
   root "cart_items#index"
-  resources :products, only: [:index]
+  resources :products, only: [ :index ]
   resources :cart_items do
     post :reset, on: :collection
   end
