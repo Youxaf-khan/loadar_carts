@@ -46,7 +46,7 @@ group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
   gem "rspec-rails", "~> 7.0.0"
-  gem "shoulda-matchers", "~> 5.2.0"
+  gem "shoulda-matchers", "~> 6.4.0"
   gem "rails-controller-testing"
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
